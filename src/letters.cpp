@@ -71,6 +71,126 @@ byte flippedExclamation[8] = {
     B01110,
     B00100};
 
+// Custom Character 0
+byte DECIMAL_0[8] = {
+    B01110,
+    B10001,
+    B10001,
+    B10001,
+    B10001,
+    B10001,
+    B01110,
+    B00000
+};
+
+// Custom Character 1
+byte DECIMAL_1[8] = {
+    B00100,
+    B01100,
+    B00100,
+    B00100,
+    B00100,
+    B00100,
+    B01110,
+    B00000
+};
+
+// Custom Character 2
+byte DECIMAL_2[8] = {
+    B01110,
+    B10001,
+    B00001,
+    B00010,
+    B00100,
+    B01000,
+    B11111,
+    B00000
+};
+
+// Custom Character 3
+byte DECIMAL_3[8] = {
+    B11111,
+    B00001,
+    B00001,
+    B01110,
+    B00001,
+    B00001,
+    B11111,
+    B00000
+};
+
+// Custom Character 4
+byte DECIMAL_4[8] = {
+    B10001,
+    B10001,
+    B10001,
+    B11111,
+    B00001,
+    B00001,
+    B00001,
+    B00000
+};
+
+// Custom Character 5
+byte DECIMAL_5[8] = {
+    B11111,
+    B10000,
+    B10000,
+    B11110,
+    B00001,
+    B00001,
+    B11110,
+    B00000
+};
+
+// Custom Character 6
+byte DECIMAL_6[8] = {
+    B01110,
+    B10001,
+    B10000,
+    B11110,
+    B10001,
+    B10001,
+    B01110,
+    B00000
+};
+
+// Custom Character 7
+byte DECIMAL_7[8] = {
+    B11111,
+    B00001,
+    B00001,
+    B00010,
+    B00100,
+    B00100,
+    B00100,
+    B00000
+};
+
+// Custom Character 8
+byte DECIMAL_8[8] = {
+    B01110,
+    B10001,
+    B01110,
+    B10001,
+    B01110,
+    B10001,
+    B01110,
+    B00000
+};
+
+// Custom Character 9
+byte DECIMAL_9[8] = {
+    B01110,
+    B10001,
+    B10001,
+    B01111,
+    B00001,
+    B00001,
+    B01110,
+    B00000
+};
+
 void diagonalFlipChar(byte (&flip_arr)[8], bool type)
 {
 

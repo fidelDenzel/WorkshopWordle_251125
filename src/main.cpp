@@ -137,7 +137,7 @@ void loop()
 
   if (enterBit != old_state)
   {
-    if (bit_ctr < 4)
+    if (bit_ctr < 3)
     {
       for (int j = 0; j < 3; j++)
       {
@@ -145,18 +145,33 @@ void loop()
         Serial.printf("iter = %d - inBit = %d - number = %d\n", bit_ctr, inBit[j], guessArray[bit_ctr]);
       }
 
+      
+      lcd.setCursor(0,1);
+      lcd.print(">");
+      lcd.setCursor(3-bit_ctr,1);
+      lcd.printf("%d",guessArray[bit_ctr]);
+
       bit_ctr++;
     }
-    else if(bit_ctr == 4){
+    else if(bit_ctr == 3){
       bit_ctr = 0;
       guessArray[0] = 0;
       guessArray[1] = 0;
       guessArray[2] = 0;
+
+      lcd.setCursor(0,1);
+      lcd.print(">");
+      lcd.setCursor(3,1);
+      lcd.printf("%d",guessArray[2]);
+      lcd.setCursor(2,1);
+      lcd.printf("%d",guessArray[1]);
+      lcd.setCursor(1,1);
+      lcd.printf("%d",guessArray[0]);
     }
-    
+
     old_state = enterBit;
     Serial.printf("ctr = %d - xor_state = %d\n", bit_ctr, enterBit);
-    Serial.printf("Number = %d%d%d\n", guessArray[2],guessArray[1],guessArray[0]);
+    Serial.printf(">%d%d%d\n", guessArray[2],guessArray[1],guessArray[0]);
   }
   
   delay(100);
