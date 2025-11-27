@@ -13,6 +13,9 @@
 // Receiver MAC: 08:3A:F2:52:80:B0 (from user's file)
 uint8_t broadcastAddress[] = {0x08, 0x3A, 0xF2, 0x52, 0x80, 0xB0};
 
+// --- NEW: BUZZER PIN DEFINITION ---
+const int BUZZER_PIN = 25; // Choose an appropriate GPIO pin for your buzzer
+
 // Structure example to send data
 // Must match the receiver structure
 // We repurpose digit0-digit3 to send back the 4 feedback codes (0, 1, or 2)
@@ -48,6 +51,23 @@ int feedbackCode[4] = {0, 0, 0, 0};
 struct_message incomingCode;
 
 esp_now_peer_info_t peerInfo;
+
+// --- NEW: Buzzer tone function ---
+void playWinTone() {
+  // Simple ascending celebratory tone
+  int melody[] = {523, 587, 659, 784}; // C5, D5, E5, G5
+  int noteDuration = 500; // milliseconds
+  bool led_state = false;
+  for (int i = 0; i < 4; i++) {
+    // Note: ESP32 uses ledcWrite, not tone(), for PWM output
+    ledcWriteTone(0, melody[i]); // Channel 0, Frequency
+    led_state ^= 1;
+    digitalWrite(13, led_state);
+    delay(noteDuration);
+  }
+  ledcWriteTone(0, 0); // Stop the tone
+}
+
 
 // Callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
@@ -141,6 +161,8 @@ void setup()
 {
   // Init Serial Monitor
   Serial.begin(115200);
+  pinMode(13,OUTPUT);
+  ledcAttachPin(BUZZER_PIN, 0); // Attach the buzzer pin to LEDC channel 0
 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -213,7 +235,9 @@ void loop()
     if (check_ctr == 4)
     {
       Serial.println("Congrats! Generating new code...");
-      delay(1000);
+      
+      // *** NEW: Play the victory sound! ***
+      playWinTone();
       
       // Generate new code (now using all 10 digits 0-9)
       srandom(time(0));
