@@ -4,9 +4,14 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include "customChars.h"
+#include <OneButton.h>
 
 // Set the I2C address, columns (20), and rows (4)
 LiquidCrystal_I2C lcd(0x27, 20, 4); // **CHANGE 0x27 IF YOUR ADDRESS IS DIFFERENT**
+OneButton butt(32, false, false); 
+
+// --- Function Prototypes ---
+void handleClick();
 
 int bit_ctr = 0;
 bool old_state = false;
@@ -102,6 +107,50 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
   Serial.println(len);
 
   incoming_len = len;
+  if(incomingCode.digit0 >= 0 && incomingCode.digit0 <= 9){
+    lcd.setCursor(4,1);
+    lcd.print(incomingCode.digit0);
+    Serial.print(incomingCode.digit0);
+  }
+  else{
+    lcd.setCursor(4,1);
+    lcd.print((char)(incomingCode.digit0));
+    Serial.print(incomingCode.digit0);
+  }
+  
+  if(incomingCode.digit1 >= 0 && incomingCode.digit1 <= 9){
+    lcd.setCursor(3,1);
+    lcd.print(incomingCode.digit1);
+    Serial.print(incomingCode.digit1);
+  }
+  else{
+    lcd.setCursor(3,1);
+    lcd.print((char)(incomingCode.digit1));
+    Serial.print(incomingCode.digit1);
+  }
+
+  if(incomingCode.digit2 >= 0 && incomingCode.digit2 <= 9){
+    lcd.setCursor(2,1);
+    lcd.print(incomingCode.digit2);
+    Serial.print(incomingCode.digit2);
+  }
+  else{
+    lcd.setCursor(2,1);
+    lcd.print((char)(incomingCode.digit2));
+    Serial.print(incomingCode.digit2);
+  }
+
+  if(incomingCode.digit3 >= 0 && incomingCode.digit3 <= 9){
+    lcd.setCursor(1,1);
+    lcd.print(incomingCode.digit3);
+    Serial.print(incomingCode.digit3);
+  }
+  else{
+    lcd.setCursor(1,1);
+    lcd.print((char)(incomingCode.digit3));
+    Serial.print(incomingCode.digit3);
+  }
+  Serial.println();
   incomingGuess_status = incomingCode.guess_status;
 }
 
@@ -142,6 +191,10 @@ void inputMatrixTranslte(bool enterPin, bool *arr){
   }
 }
 
+void handleClick() {
+  enterBit ^= 1;
+}
+
 void setup()
 {
 
@@ -150,9 +203,10 @@ void setup()
   pinMode(19, INPUT_PULLUP);
   pinMode(18, INPUT_PULLUP);
 
-  pinMode(32, INPUT_PULLUP);
+  pinMode(32, INPUT_PULLDOWN);
+  butt.attachClick(handleClick);
 
-  attachInterrupt(digitalPinToInterrupt(32), handleInterrupt, FALLING);
+  // attachInterrupt(digitalPinToInterrupt(32), handleInterrupt, FALLING);
 
   lcd.init();
   lcd.backlight();
@@ -226,11 +280,11 @@ void setup()
   delay(3000);
   lcd.clear();
 }
-bool old_but_state = false;
+
 void loop()
 {
   // put your main code here, to run repeatedly:
-
+  butt.tick();
   bool inBit[3] = {!digitalRead(18), !digitalRead(19), !digitalRead(23)};
 
   lcd.setCursor(0, 0);
@@ -241,6 +295,12 @@ void loop()
 
 // Convert Binary to Decimal->Show it to LCD->Send guess decimal guess array
   int code_digit = 4;
+
+  // Blink cursor at number decimal entry
+  lcd.setCursor(code_digit - bit_ctr, 1);
+  // lcd.cursor_on();
+  // lcd.blink_on();
+
   // If the input is entered or not
   if (enterBit != old_state)
   {
@@ -275,13 +335,14 @@ void loop()
       lcd.setCursor(0, 1);
       lcd.print(">");
       lcd.setCursor(4, 1);
-      lcd.printf("%d", guessArray[3]);
+      lcd.print((char)guessArray[3]);
       lcd.setCursor(3, 1);
-      lcd.printf("%d", guessArray[2]);
+      lcd.print((char)guessArray[2]);
       lcd.setCursor(2, 1);
-      lcd.printf("%d", guessArray[1]);
+      lcd.print((char)guessArray[1]);
       lcd.setCursor(1, 1);
-      lcd.printf("%d", guessArray[0]);
+      lcd.print((char)guessArray[0]);
+
       // Send message via ESP-NOW
       esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&sendData, sizeof(sendData));
 
