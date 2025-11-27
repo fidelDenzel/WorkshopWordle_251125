@@ -17,6 +17,7 @@ int bit_ctr = 0;
 bool old_state = false;
 int guessArray[4] = {0, 0, 0, 0};
 bool enterBit = false;
+int try_attempt = 0;
 
 // --- Debounce Configuration ---
 // Time (in ms) to ignore further signals after the initial interrupt.
@@ -87,15 +88,21 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
   if (status == 0)
   {
     success = "Delivery Success :)";
-    lcd.setCursor(9, 0);
-    lcd.print((char)B01011110);
+    lcd.setCursor(19, 0);
+    lcd.print((char)B01011110); // '^'
   }
   else
   {
     success = "Delivery Fail :(";
-    lcd.setCursor(9, 0);
+    lcd.setCursor(19, 0);
     lcd.print("?");
   }
+  try_attempt++;
+  lcd.setCursor(9, 0);
+  lcd.print("Try");
+
+  lcd.setCursor(9, 1);
+  lcd.print(try_attempt);
 }
 
 // Callback when data is received
@@ -107,50 +114,25 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
   Serial.println(len);
 
   incoming_len = len;
-  if(incomingCode.digit0 >= 0 && incomingCode.digit0 <= 9){
-    lcd.setCursor(4,1);
-    lcd.print(incomingCode.digit0);
-    Serial.print(incomingCode.digit0);
-  }
-  else{
-    lcd.setCursor(4,1);
-    lcd.print((char)(incomingCode.digit0));
-    Serial.print(incomingCode.digit0);
-  }
-  
-  if(incomingCode.digit1 >= 0 && incomingCode.digit1 <= 9){
-    lcd.setCursor(3,1);
-    lcd.print(incomingCode.digit1);
-    Serial.print(incomingCode.digit1);
-  }
-  else{
-    lcd.setCursor(3,1);
-    lcd.print((char)(incomingCode.digit1));
-    Serial.print(incomingCode.digit1);
-  }
+  incomingDigit[0]= incomingCode.digit3;
+  incomingDigit[1]= incomingCode.digit2;
+  incomingDigit[2]= incomingCode.digit1;
+  incomingDigit[3]= incomingCode.digit0;
 
-  if(incomingCode.digit2 >= 0 && incomingCode.digit2 <= 9){
-    lcd.setCursor(2,1);
-    lcd.print(incomingCode.digit2);
-    Serial.print(incomingCode.digit2);
-  }
-  else{
-    lcd.setCursor(2,1);
-    lcd.print((char)(incomingCode.digit2));
-    Serial.print(incomingCode.digit2);
-  }
-
-  if(incomingCode.digit3 >= 0 && incomingCode.digit3 <= 9){
-    lcd.setCursor(1,1);
-    lcd.print(incomingCode.digit3);
-    Serial.print(incomingCode.digit3);
-  }
-  else{
-    lcd.setCursor(1,1);
-    lcd.print((char)(incomingCode.digit3));
-    Serial.print(incomingCode.digit3);
+  for (int i = 0; i < 4; i++) {
+    if(incomingDigit[3-i] >= 0 && incomingDigit[3-i] <= 9){
+      lcd.setCursor(4-i,1);
+      lcd.print(incomingDigit[3-i]);
+      Serial.print(incomingDigit[3-i]);
+    }
+    else{
+      lcd.setCursor(4-i,1);
+      lcd.print((char)(incomingDigit[3-i]));
+      Serial.print(incomingDigit[3-i]);
+    }
   }
   Serial.println();
+
   incomingGuess_status = incomingCode.guess_status;
 }
 
@@ -288,7 +270,21 @@ void loop()
   bool inBit[3] = {!digitalRead(18), !digitalRead(19), !digitalRead(23)};
 
   lcd.setCursor(0, 0);
-  lcd.printf("%d%d%d-%d", inBit[0], inBit[1], inBit[2], enterBit);
+  lcd.print(inBit[0]);
+
+  lcd.setCursor(1, 0);
+  lcd.print(inBit[1]);
+  
+  lcd.setCursor(2, 0);
+  lcd.print(inBit[2]);
+
+  lcd.setCursor(3, 0);
+  lcd.print((char)B01111110); // '-'
+
+  lcd.setCursor(4, 0);
+  lcd.print(enterBit);
+  
+  // lcd.printf("%d%d%d-%d", inBit[0], inBit[1], inBit[2], enterBit);
 
   // print diagonally matrix-translate binary input digit
   // inputMatrixTranslte(enterBit, inBit);
@@ -298,8 +294,8 @@ void loop()
 
   // Blink cursor at number decimal entry
   lcd.setCursor(code_digit - bit_ctr, 1);
-  // lcd.cursor_on();
-  // lcd.blink_on();
+  lcd.cursor_on();
+  lcd.blink_on();
 
   // If the input is entered or not
   if (enterBit != old_state)
@@ -315,7 +311,7 @@ void loop()
       lcd.setCursor(0, 1);
       lcd.print(">");
       lcd.setCursor(code_digit - bit_ctr, 1);
-      lcd.printf("%d", guessArray[bit_ctr]);
+      lcd.print(guessArray[bit_ctr]);
 
       bit_ctr++;
     }
@@ -362,8 +358,11 @@ void loop()
   }
 
   if(incoming_len > 0){
-    lcd.setCursor(9,1);
+    lcd.setCursor(19,1);
     lcd.print(incomingCode.guess_status);
+    if (incomingCode.guess_status == 4){
+      try_attempt = 0;
+    }
     incoming_len = 0;
   }
 
