@@ -144,7 +144,6 @@ void loop()
         guessArray[bit_ctr] += inBit[j] * pow(2, 2 - j);
         Serial.printf("iter = %d - inBit = %d - number = %d\n", bit_ctr, inBit[j], guessArray[bit_ctr]);
       }
-
       
       lcd.setCursor(0,1);
       lcd.print(">");
