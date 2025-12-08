@@ -6,6 +6,8 @@
 #include "customChars.h"
 #include <OneButton.h>
 
+#define LCD_SCREEN_LIMIT 16-1
+
 // Set the I2C address, columns (20), and rows (4)
 // LiquidCrystal_I2C lcd(0x27, 20, 4); // 0x27 is for 20x4 LCD HD44780
 LiquidCrystal_I2C lcd(0x3F, 16, 2); // 0x3F is for 16x2 LCD HD44780
@@ -98,13 +100,13 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
   if (status == 0)
   {
     success = "Delivery Success :)";
-    lcd.setCursor(19, 0);
+    lcd.setCursor(LCD_SCREEN_LIMIT, 0);
     lcd.print((char)B01011110); // '^'
   }
   else
   {
     success = "Delivery Fail :(";
-    lcd.setCursor(19, 0);
+    lcd.setCursor(LCD_SCREEN_LIMIT, 0);
     lcd.print("?");
   }
   try_attempt++;
@@ -128,6 +130,16 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
   incomingDigit[1]= incomingCode.digit2;
   incomingDigit[2]= incomingCode.digit1;
   incomingDigit[3]= incomingCode.digit0;
+
+  // Print Sender MAC
+  Serial.print("Sender MAC Address: ");
+  for (int i = 0; i < 6; i++) {
+    Serial.printf("%02X", mac[i]);
+    if (i < 5) Serial.print(":");
+  }
+  Serial.println();
+
+  Serial.printf("Master Resp. >> %d%d%d%d\n---\n", incomingDigit[3], incomingDigit[2], incomingDigit[1], incomingDigit[0]);
 
   for (int i = 0; i < 4; i++) {
     if(incomingDigit[3-i] >= 0 && incomingDigit[3-i] <= 9){
@@ -153,30 +165,30 @@ void inputMatrixTranslte(bool enterPin, bool *arr){
     {
       if (arr[i] > 0)
       {
-        lcd.setCursor(19 - i, 1);
+        lcd.setCursor(LCD_SCREEN_LIMIT - i, 1);
         lcd.write(6);
       }
       else if (arr[i] == 0)
       {
-        lcd.setCursor(19 - i, 1);
+        lcd.setCursor(LCD_SCREEN_LIMIT - i, 1);
         lcd.print('0');
       }
     }
     else if (i == 3)
     {
-      lcd.setCursor(19 - i, 1);
+      lcd.setCursor(LCD_SCREEN_LIMIT - i, 1);
       lcd.print('-');
     }
     else if (i == 4)
     {
       if (enterPin > 0)
       {
-        lcd.setCursor(19 - i, 1);
+        lcd.setCursor(LCD_SCREEN_LIMIT - i, 1);
         lcd.write(6);
       }
       else if (enterPin == 0)
       {
-        lcd.setCursor(19 - i, 1);
+        lcd.setCursor(LCD_SCREEN_LIMIT - i, 1);
         lcd.print('0');
       }
     }
@@ -230,8 +242,8 @@ void setup()
   if (esp_now_add_peer(&peerInfo) != ESP_OK)
   {
     Serial.println("Failed to add peer");
-    lcd.setCursor(9, 0);
-    lcd.print("x");
+    // lcd.setCursor(9, 0);
+    // lcd.print("x");
     return;
   }
 
@@ -271,6 +283,9 @@ void setup()
 
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
+
+  Serial.print("Receiver MAC: ");
+  Serial.println(WiFi.macAddress());
 
   delay(3000);
   lcd.clear();
@@ -371,7 +386,7 @@ void loop()
   }
 
   if(incoming_len > 0){
-    lcd.setCursor(19,1);
+    lcd.setCursor(LCD_SCREEN_LIMIT,1);
     lcd.print(incomingCode.guess_status);
     if (incomingCode.guess_status == 4){
       try_attempt = 0;
