@@ -19,7 +19,7 @@
 // uint8_t broadcastAddress[] = {0x3C, 0x71, 0xBF, 0xFD, 0x44, 0x6C}; // (5)
 // uint8_t broadcastAddress[] = {0xE8, 0x68, 0xE7, 0x27, 0xCB, 0x94}; // (6)
 // uint8_t broadcastAddress[] = {0x94, 0xE6, 0x86, 0x3D, 0x6A, 0xC0}; // (7)
-uint8_t broadcastAddress[] = {0xD8, 0x2A, 0xF2, 0x52, 0x80, 0xB0}; // (8)
+uint8_t broadcastAddress[] = {0x08, 0x3A, 0xF2, 0x52, 0x80, 0xB0}; // (8)
 // uint8_t broadcastAddress[] = {0xD0, 0xEF, 0x76, 0x49, 0x37, 0x6C}; // (9)
 
 // --- NEW: BUZZER PIN DEFINITION ---
@@ -82,8 +82,18 @@ void playWinTone() {
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
   // Do nothing or log status
-  (void)mac_addr;
-  (void)status;
+  // (void)mac_addr;
+  // (void)status;
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  if (status == 0)
+  {
+    success = "Delivery Success :)";
+  }
+  else
+  {
+    success = "Delivery Fail :(";
+  }
 }
 
 // Callback when data is received
@@ -170,6 +180,8 @@ void setup()
 {
   // Init Serial Monitor
   Serial.begin(115200);
+  delay(1000);
+
   pinMode(13,OUTPUT);
   ledcAttachPin(BUZZER_PIN, 0); // Attach the buzzer pin to LEDC channel 0
 
@@ -206,6 +218,9 @@ void setup()
   for (int i = 0; i < 4; i++) {
       randomNumber[i] = random(8); // Generates a number from 0 to 9
   }
+
+  Serial.print("Receiver MAC: ");
+  Serial.println(WiFi.macAddress());
 
   Serial.printf("\n\nTo start things off = %d%d%d%d\n\n", randomNumber[0], randomNumber[1], randomNumber[2], randomNumber[3]);
 
@@ -261,5 +276,5 @@ void loop()
     incoming_len = 0;
     // check_ctr is already reset by the checkGuess() return value
   }
-  delay(100);
+  delay(1000);
 }
