@@ -55,14 +55,14 @@ void IRAM_ATTR handleInterrupt()
 // Receiver MAC: 78:E3:6D:11:26:30
 // uint8_t broadcastAddress[] = {0x3C, 0x71, 0xBF, 0xFD, 0x44, 0x6C};
 
-// uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAC, 0x60}; // (1)
+uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAC, 0x60}; // (1)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xA8, 0x74}; // (2)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0x92, 0xD0}; // (3)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0x91, 0xA0}; // (4)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0x93, 0xF8}; // (5)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0x9B, 0x40}; // (6)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAC, 0xAC}; // (7)
-uint8_t broadcastAddress[] = {0x78, 0xE3, 0x6D, 0x11, 0x26, 0x30}; // (8)
+// uint8_t broadcastAddress[] = {0x78, 0xE3, 0x6D, 0x11, 0x26, 0x30}; // (8)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAD, 0xD0}; // (9)
 
 // Structure example to send data
@@ -82,7 +82,7 @@ String success;
 
 // Define variables to store incoming readings
 int incomingDigit[4] = {0, 0, 0, 0};
-int incomingGuess_status;
+// int incomingGuess_status;
 
 // Create a struct_message to sendData
 struct_message sendData;
@@ -100,21 +100,16 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status)
   if (status == 0)
   {
     success = "Delivery Success :)";
-    lcd.setCursor(LCD_SCREEN_LIMIT, 0);
-    lcd.print((char)B01011110); // '^'
+    // lcd.setCursor(LCD_SCREEN_LIMIT, 0);
+    // lcd.print((char)B01011110); // '^'
   }
   else
   {
     success = "Delivery Fail :(";
-    lcd.setCursor(LCD_SCREEN_LIMIT, 0);
-    lcd.print("?");
+    // lcd.setCursor(LCD_SCREEN_LIMIT, 0);
+    // lcd.print("?");
   }
   try_attempt++;
-  lcd.setCursor(9, 0);
-  lcd.print("Try");
-
-  lcd.setCursor(9, 1);
-  lcd.print(try_attempt);
 }
 
 // Callback when data is received
@@ -139,23 +134,9 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
   }
   Serial.println();
 
-  Serial.printf("Master Resp. >> %d%d%d%d\n---\n", incomingDigit[3], incomingDigit[2], incomingDigit[1], incomingDigit[0]);
+  Serial.printf("Master Resp. >> %d%d%d%d\n---\n", incomingDigit[0], incomingDigit[1], incomingDigit[2], incomingDigit[3]);
 
-  for (int i = 0; i < 4; i++) {
-    if(incomingDigit[3-i] >= 0 && incomingDigit[3-i] <= 9){
-      lcd.setCursor(4-i,1);
-      lcd.print(incomingDigit[3-i]);
-      Serial.print(incomingDigit[3-i]);
-    }
-    else{
-      lcd.setCursor(4-i,1);
-      lcd.print((char)(incomingDigit[3-i]));
-      Serial.print(incomingDigit[3-i]);
-    }
-  }
-  Serial.println();
-
-  incomingGuess_status = incomingCode.guess_status;
+  // incomingGuess_status = incomingCode.guess_status;
 }
 
 void inputMatrixTranslte(bool enterPin, bool *arr){
@@ -197,6 +178,39 @@ void inputMatrixTranslte(bool enterPin, bool *arr){
 
 void handleClick() {
   enterBit ^= 1;
+}
+
+void invertedHello(){
+  diagonalFlipChar(flippedHeitch, 1);
+  lcd.createChar(0, flippedHeitch);
+  lcd.setCursor(10, 1);
+  lcd.write(0);
+
+  diagonalFlipChar(flippedEe, 1);
+  lcd.createChar(1, flippedEe);
+  lcd.setCursor(9, 1);
+  lcd.write(1);
+
+  diagonalFlipChar(flippedeL, 1);
+  lcd.createChar(2, flippedeL);
+  lcd.setCursor(8, 1);
+  lcd.write(2);
+
+  lcd.setCursor(7, 1);
+  lcd.write(2);
+
+  diagonalFlipChar(flippedOw, 1);
+  lcd.createChar(4, flippedOw);
+  lcd.setCursor(6, 1);
+  lcd.write(4);
+
+  diagonalFlipChar(flippedExclamation, 1);
+  lcd.createChar(5, flippedExclamation);
+  lcd.setCursor(5, 1);
+  lcd.write(5);
+
+  diagonalFlipChar(flippedOne, 1);
+  lcd.createChar(6, flippedOne);
 }
 
 void setup()
@@ -247,39 +261,10 @@ void setup()
     return;
   }
 
-  lcd.setCursor(7, 0);
+  lcd.setCursor(5, 0);
   lcd.printf("HELLO!");
 
-  diagonalFlipChar(flippedHeitch, 1);
-  lcd.createChar(0, flippedHeitch);
-  lcd.setCursor(12, 1);
-  lcd.write(0);
-
-  diagonalFlipChar(flippedEe, 1);
-  lcd.createChar(1, flippedEe);
-  lcd.setCursor(11, 1);
-  lcd.write(1);
-
-  diagonalFlipChar(flippedeL, 1);
-  lcd.createChar(2, flippedeL);
-  lcd.setCursor(10, 1);
-  lcd.write(2);
-
-  lcd.setCursor(9, 1);
-  lcd.write(2);
-
-  diagonalFlipChar(flippedOw, 1);
-  lcd.createChar(4, flippedOw);
-  lcd.setCursor(8, 1);
-  lcd.write(4);
-
-  diagonalFlipChar(flippedExclamation, 1);
-  lcd.createChar(5, flippedExclamation);
-  lcd.setCursor(7, 1);
-  lcd.write(5);
-
-  diagonalFlipChar(flippedOne, 1);
-  lcd.createChar(6, flippedOne);
+  invertedHello();
 
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(esp_now_recv_cb_t(OnDataRecv));
@@ -288,7 +273,17 @@ void setup()
   Serial.println(WiFi.macAddress());
 
   delay(3000);
+
+  // Clear greetings on RAM and ROM
   lcd.clear();
+  lcd.createChar(0, blankChar);
+  lcd.createChar(1, blankChar);
+  lcd.createChar(2, blankChar);
+  lcd.createChar(3, blankChar);
+  lcd.createChar(4, blankChar);
+  lcd.createChar(5, blankChar);
+  lcd.createChar(6, blankChar);
+
 }
 
 void loop()
@@ -328,6 +323,7 @@ void loop()
   // If the input is entered or not
   if (enterBit != old_state)
   {
+    
     if (bit_ctr < code_digit)
     {
       for (int j = 0; j < 3; j++)
@@ -386,9 +382,32 @@ void loop()
   }
 
   if(incoming_len > 0){
+
+    for (int i = 0; i < 4; i++) {
+      lcd.setCursor(4-i,1);
+      // lcd.print(incomingDigit[3-i]);
+      if(incomingDigit[3-i] == 0){
+        lcd.print("x");
+      }
+      else if (incomingDigit[3-i] == 1) {
+        lcd.print("?");
+      }
+      else if (incomingDigit[3-i] == 2) {
+        if(i == 0) lcd.print(sendData.digit0);
+        else if (i == 1) lcd.print(sendData.digit1);
+        else if (i == 2) lcd.print(sendData.digit2);
+        else if (i == 3) lcd.print(sendData.digit3);
+      }
+    }
+
+    lcd.setCursor(LCD_SCREEN_LIMIT-4,0);
+    lcd.print(" Try:");
     lcd.setCursor(LCD_SCREEN_LIMIT,1);
-    lcd.print(incomingCode.guess_status);
+    lcd.print(try_attempt);
+
     if (incomingCode.guess_status == 4){
+      lcd.setCursor(LCD_SCREEN_LIMIT-4,0);
+      lcd.print("YEAY:");
       try_attempt = 0;
     }
     incoming_len = 0;
