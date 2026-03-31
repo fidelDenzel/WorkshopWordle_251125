@@ -7,6 +7,9 @@
 #include <OneButton.h>
 
 #define LCD_SCREEN_LIMIT 16-1
+#define BIT_0 23
+#define BIT_1 19
+#define BIT_2 18
 
 // Set the I2C address, columns (20), and rows (4)
 // LiquidCrystal_I2C lcd(0x27, 20, 4); // 0x27 is for 20x4 LCD HD44780
@@ -53,9 +56,12 @@ void IRAM_ATTR handleInterrupt()
 // REPLACE WITH THE MAC Address of your receiver
 // Receiver MAC: 3C:71:BF:FD:44:6C
 // Receiver MAC: 78:E3:6D:11:26:30
+
+// So Below please upload the server/random-number-generator NOT the player's MAC Address
+
 // uint8_t broadcastAddress[] = {0x3C, 0x71, 0xBF, 0xFD, 0x44, 0x6C};
 
-uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAC, 0x60}; // (1)
+// uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAC, 0x60}; // (1)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xA8, 0x74}; // (2)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0x92, 0xD0}; // (3)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0x91, 0xA0}; // (4)
@@ -64,6 +70,12 @@ uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAC, 0x60}; // (1)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAC, 0xAC}; // (7)
 // uint8_t broadcastAddress[] = {0x78, 0xE3, 0x6D, 0x11, 0x26, 0x30}; // (8)
 // uint8_t broadcastAddress[] = {0x60, 0x55, 0xF9, 0x7B, 0xAD, 0xD0}; // (9)
+
+// uint8_t broadcastAddress[] = {0x9C, 0x13, 0x9E, 0x69, 0xC2, 0x74}; // (1.1)
+// uint8_t broadcastAddress[] = {0x9C, 0x13, 0x9E, 0x74, 0xC5, 0x9C}; // (1.2)
+// uint8_t broadcastAddress[] = {0x9C, 0x13, 0x9E, 0x68, 0xC3, 0x1C}; // (1.3)
+// uint8_t broadcastAddress[] = {0x9C, 0x13, 0x9E, 0x68, 0x8E, 0x08}; // (1.4)
+uint8_t broadcastAddress[] = {0x9C, 0x13, 0x9E, 0x68, 0x5F, 0xFC}; // (1.5)
 
 // Structure example to send data
 // Must match the receiver structure
@@ -220,9 +232,9 @@ void setup()
   delay(1000);
   
   Serial.println("BINUS CompEng's Wordle!");
-  pinMode(23, INPUT_PULLUP);
-  pinMode(19, INPUT_PULLUP);
-  pinMode(18, INPUT_PULLUP);
+  pinMode(BIT_0, INPUT_PULLUP);
+  pinMode(BIT_1, INPUT_PULLUP);
+  pinMode(BIT_2, INPUT_PULLUP);
 
   pinMode(32, INPUT_PULLDOWN);
   butt.attachClick(handleClick);
